@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain - AI Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🧠</div>
+                    <span class="logo-text">Brain</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-item active">
+                    <span class="menu-icon">💬</span>
+                    <span class="menu-text">New Chat</span>
+                </div>
+                <div class="menu-item">
+                    <span class="menu-icon">🔍</span>
+                    <span class="menu-text">Search</span>
+                </div>
+                <div class="menu-item" id="voice-settings-nav">
+                    <span class="menu-icon">🎤</span>
+                    <span class="menu-text">Voice</span>
+                </div>
+                <div class="menu-item">
+                    <span class="menu-icon">💼</span>
+                    <span class="menu-text">Workspace</span>
+                </div>
+            </div>
+            
+            <div class="chat-section">
+                <div class="section-header">Chats</div>
+                <div class="chat-list">
+                    <div class="chat-item active">
+                        <span class="chat-title">Current Session</span>
+                        <span class="chat-time">Now</span>
+                    </div>
+                    <div class="chat-item">
+                        <span class="chat-title">Voice Testing</span>
+                        <span class="chat-time">1h ago</span>
+                    </div>
+                    <div class="chat-item">
+                        <span class="chat-title">Model Config</span>
+                        <span class="chat-time">3h ago</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">J</div>
+                    <span class="user-name">Jenith</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="model-selector">
+                    <select id="model-select" class="model-dropdown">
+                        <option value="captaineris-nebula:latest">captaineris-nebula:latest</option>
+                    </select>
+                    <button class="set-default-btn">Set as default</button>
+                </div>
+                <div class="top-controls">
+                    <button class="control-btn" title="Settings">⚙️</button>
+                    <button class="control-btn" title="Share">📤</button>
+                    <button class="control-btn" id="menu-btn" title="Menu">☰</button>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="chat-area">
+                <!-- Welcome Screen -->
+                <div id="welcome-screen" class="welcome-screen">
+                    <div class="welcome-content">
+                        <div class="model-title">
+                            <div class="model-icon">🧠</div>
+                            <h1 id="model-name">captaineris-nebula:latest</h1>
+                        </div>
+                        
+                        <div class="suggestions">
+                            <div class="suggestion-label">✨ Suggested</div>
+                            <div class="suggestion-grid">
+                                <div class="suggestion-card">
+                                    <div class="suggestion-title">Voice conversation</div>
+                                    <div class="suggestion-text">Start a voice-to-voice chat with Brain</div>
+                                </div>
+                                <div class="suggestion-card">
+                                    <div class="suggestion-title">Text chat</div>
+                                    <div class="suggestion-text">Type your questions and get responses</div>
+                                </div>
+                                <div class="suggestion-card">
+                                    <div class="suggestion-title">Mixed mode</div>
+                                    <div class="suggestion-text">Combine voice and text in one conversation</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voice Settings Page -->
+                <div id="voice-settings-page" class="voice-settings-page" style="display: none;">
+                    <!-- TTS Server Status Section -->
+                    <div class="voice-section server-status">
+                        <h3>TTS Server Status</h3>
+                        <div class="server-info">
+                            <span class="status-indicator" id="tts-status">🔴</span>
+                            <span>TTS-WebUI: http://localhost:8880/</span>
+                            <button id="open-tts-webui" class="action-btn">Open TTS-WebUI</button>
+                            <button id="refresh-server-status" class="action-btn">Refresh</button>
+                        </div>
+                    </div>
+
+                    <!-- Model Selection with Tabs -->
+                    <div class="voice-section model-selection">
+                        <h3>TTS Model Selection</h3>
+                        <div class="model-tabs" id="model-tabs">
+                            <div class="model-tab active" data-model="kokoro">Kokoro</div>
+                            <div class="model-tab" data-model="f5-tts">F5-TTS</div>
+                            <div class="model-tab" data-model="xtts">XTTS</div>
+                            <div class="model-tab" data-model="bark">Bark</div>
+                        </div>
+                        
+                        <div class="model-card" id="active-model-card">
+                            <div class="model-info">
+                                <h4 id="model-name">Kokoro</h4>
+                                <div class="model-details">
+                                    <span>Quality: High</span>
+                                    <span>Latency: ~200ms</span>
+                                    <span>Languages: EN, Multi</span>
+                                </div>
+                            </div>
+                            
+                            <div class="voice-controls">
+                                <!-- Standard voice controls for Kokoro/Bark -->
+                                <div id="standard-voice-controls">
+                                    <div class="control-row">
+                                        <label>Voice:</label>
+                                        <select id="voice-model-select">
+                                            <option value="af_aoede">af_aoede</option>
+                                            <option value="af_bella">af_bella</option>
+                                            <option value="af_sarah">af_sarah</option>
+                                            <option value="am_adam">am_adam</option>
+                                            <option value="am_michael">am_michael</option>
+                                        </select>
+                                        <button id="play-sample" class="action-btn">▶️ Play Sample</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- F5-TTS voice cloning controls -->
+                                <div id="f5tts-voice-controls" style="display: none;">
+                                    <div class="reference-upload">
+                                        <label>Reference Voice:</label>
+                                        <div id="audio-drop-zone" class="drop-zone">
+                                            📁 Drop WAV file here or click to browse
+                                            <input type="file" id="ref-audio-file" accept="audio/*" style="display: none;">
+                                        </div>
+                                        <div class="record-controls">
+                                            <button id="record-ref-btn" class="action-btn">🎤 Record</button>
+                                            <button id="stop-ref-btn" class="action-btn" style="display: none;">⏹️ Stop</button>
+                                            <button id="play-ref-btn" class="action-btn" style="display: none;">▶️ Play</button>
+                                        </div>
+                                        <div class="ref-text-input">
+                                            <label>Reference Text (optional):</label>
+                                            <input type="text" id="ref-text" placeholder="Text spoken in reference audio">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Dynamic sliders based on model capabilities -->
+                                <div id="model-sliders">
+                                    <div class="slider-row">
+                                        <label>Speed:</label>
+                                        <input type="range" id="voice-speed" min="0.5" max="2.0" step="0.1" value="1.0">
+                                        <span id="speed-value">1.0x</span>
+                                    </div>
+                                    <div class="slider-row">
+                                        <label>Pitch:</label>
+                                        <input type="range" id="voice-pitch" min="-0.5" max="0.5" step="0.1" value="0.0">
+                                        <span id="pitch-value">0.0</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="voice-test">
+                                    <textarea id="sample-text" placeholder="Hello, this is my voice. Do you like it?">Hello, this is my voice. Do you like it?</textarea>
+                                    <button id="test-voice" class="action-btn">🔊 Test Voice</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VAD Controls Section -->
+                    <div class="voice-section vad-controls">
+                        <h3>Voice Activity Detection</h3>
+                        <div class="vad-sliders">
+                            <div class="slider-row">
+                                <label>Sensitivity:</label>
+                                <input type="range" id="vad-sensitivity-main" min="-50" max="-10" value="-30">
+                                <span id="sensitivity-value-main">-30dB</span>
+                            </div>
+                            <div class="slider-row">
+                                <label>Resume Delay:</label>
+                                <input type="range" id="resume-delay" min="200" max="1500" value="600">
+                                <span id="resume-delay-value">600ms</span>
+                            </div>
+                            <div class="slider-row">
+                                <label>Min Record Time:</label>
+                                <input type="range" id="min-record-time" min="400" max="1500" value="800">
+                                <span id="min-record-value">800ms</span>
+                            </div>
+                            <div class="slider-row">
+                                <label>Hangover Time:</label>
+                                <input type="range" id="hangover-time" min="100" max="800" value="300">
+                                <span id="hangover-value">300ms</span>
+                            </div>
+                            <div class="slider-row">
+                                <label>Mic Gain:</label>
+                                <input type="range" id="mic-gain" min="-10" max="20" value="0">
+                                <span id="mic-gain-value">+0dB</span>
+                            </div>
+                        </div>
+                        
+                        <div class="vad-options">
+                            <label>
+                                <input type="checkbox" id="auto-pause-tts" checked>
+                                Auto-pause during TTS
+                            </label>
+                            <label>
+                                <input type="checkbox" id="acoustic-feedback-protection" checked>
+                                Acoustic feedback protection
+                            </label>
+                        </div>
+                        
+                        <div class="vad-actions">
+                            <button id="test-microphone" class="action-btn">🎙️ Test Microphone</button>
+                            <button id="save-voice-profile" class="action-btn">Save Profile</button>
+                            <button id="reset-vad-defaults" class="action-btn">Reset to Defaults</button>
+                        </div>
+
+                        <!-- VAD Live Monitor -->
+                        <div class="vad-monitor">
+                            <div class="monitor-label">Microphone Level:</div>
+                            <div class="level-meter">
+                                <div class="level-bar" id="mic-level-bar"></div>
+                                <div class="level-text" id="mic-level-text">-∞ dB</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div id="messages-container" class="messages-container" style="display: none;">
+                    <!-- Messages will appear here -->
+                </div>
+
+                <!-- Voice Visualization (Hidden initially) -->
+                <div id="voice-viz" class="voice-visualization" style="display: none;">
+                    <div class="voice-circles">
+                        <div class="user-circle-container">
+                            <div id="user-circle" class="voice-circle user">
+                                <div class="circle-pulse"></div>
+                            </div>
+                            <span class="circle-label">You</span>
+                        </div>
+                        
+                        <div class="assistant-circle-container">
+                            <div id="assistant-circles" class="thinking-dots">
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                            <span class="circle-label">Brain</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Text Display -->
+                    <div class="live-text">
+                        <div class="text-bubble user-bubble">
+                            <div class="bubble-label">You said:</div>
+                            <div id="user-live-text" class="bubble-content">Ready to listen...</div>
+                        </div>
+                        <div class="text-bubble assistant-bubble">
+                            <div class="bubble-label">Brain responds:</div>
+                            <div id="assistant-live-text" class="bubble-content">Waiting for your message...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-container">
+                    <button id="attachment-btn" class="input-btn" title="Attach">📎</button>
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="message-input" 
+                            placeholder="How can I help you today?"
+                            rows="1"
+                        ></textarea>
+                        <div class="input-actions">
+                            <select id="voice-select" class="voice-selector" title="Voice">
+                                <option value="af_aoede">af_aoede</option>
+                                <option value="af_bella">af_bella</option>
+                                <option value="af_sarah">af_sarah</option>
+                                <option value="am_adam">am_adam</option>
+                                <option value="am_michael">am_michael</option>
+                            </select>
+                            <button id="voice-btn" class="voice-button" title="Voice input">🎤</button>
+                            <button id="voice-mode-btn" class="voice-mode-button" title="Voice Mode">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 12h16M4 6h16M4 18h16"/>
+                                </svg>
+                            </button>
+                            <!-- Voice Settings Panel -->
+                            <div id="voice-settings" class="voice-settings-panel">
+                                <div class="voice-setting">
+                                    <label for="sensitivity-slider">Voice Sensitivity:</label>
+                                    <input type="range" id="sensitivity-slider" min="-60" max="-20" value="-45" step="1">
+                                    <span id="sensitivity-value">-45 dB</span>
+                                </div>
+                                <div class="voice-setting">
+                                    <label for="timeout-slider">Auto-stop Delay:</label>
+                                    <input type="range" id="timeout-slider" min="1000" max="5000" value="2000" step="100">
+                                    <span id="timeout-value">2.0s</span>
+                                </div>
+                            </div>
+                            <button id="send-btn" class="send-button" title="Send">➤</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <div class="status-left">
+                        <span id="connection-status" class="connection-status">● Connected</span>
+                        <span class="audio-status">
+                            <button id="audio-toggle" class="audio-toggle-btn enabled">🔊</button>
+                            Audio enabled
+                        </span>
+                    </div>
+                    <div class="status-right">
+                        <button id="clear-btn" class="clear-button">Clear chat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voice Mode Panel (Right Side) - Now inside main layout -->
+        <div id="voice-panel" class="voice-panel" style="display: none;">
+            <div class="voice-panel-header">
+                <h3>Voice Mode</h3>
+                <button id="close-voice-panel" class="close-panel-btn">✕</button>
+            </div>
+            <div class="voice-panel-content">
+                <!-- VAD Controls -->
+                <div class="vad-controls">
+                    <div class="vad-toggle">
+                        <label>
+                            <input type="checkbox" id="vad-enabled" checked>
+                            <span>Auto-detect silence</span>
+                        </label>
+                    </div>
+                    
+                    <div class="vad-settings">
+                        <div class="setting-row">
+                            <label>Sensitivity:</label>
+                            <input type="range" id="sensitivity-slider" min="-60" max="-20" value="-45" step="1">
+                            <span id="sensitivity-value">-45 dB</span>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <label>Current Level:</label>
+                            <div class="audio-level">
+                                <span id="current-audio-level">-- dB</span>
+                                <span id="audio-status-icon">🔇</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="voice-chat-messages" class="voice-chat-messages"></div>
+                <div class="voice-status">
+                    <div class="voice-indicator">
+                        <span class="pulse-dot"></span>
+                        <span id="voice-status-text">Ready</span>
+                    </div>
+                    <div id="voice-transcript" class="voice-transcript"></div>
+                </div>
+            </div>
+            <div class="voice-panel-footer">
+                <button id="stop-voice-mode" class="stop-voice-btn">Stop Voice Mode</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Listening Indicator -->
+    <div id="listening-indicator" class="listening-indicator" style="display: none;">
+        <div class="listening-content">
+            <div class="listening-pulse"></div>
+            <span class="listening-text">Listening...</span>
+        </div>
+        <button id="stop-listening" class="stop-listening-btn">✕</button>
+    </div>
+
+    <audio id="audio-player" preload="none"></audio>
+    <script src="/static/voice-settings.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
